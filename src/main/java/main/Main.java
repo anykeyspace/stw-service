@@ -1,24 +1,29 @@
 package main;
 
+import accounts.AccountService;
+import accounts.UserProfile;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
+import servlets.SignInServlet;
+import servlets.SignUpServlet;
 
 public class Main {
     public static void main(String[] args) throws Exception {
+        AccountService accountService = new AccountService();
 
-        // Создаем обработчик
-        Frontend frontend = new Frontend();
+        accountService.addNewUser(new UserProfile("admin"));
+        accountService.addNewUser(new UserProfile("test"));
 
-        // Создаем сервер Jetty. Основной класс библиотеки Jetty.
-        Server server = new Server(8080); // Указываем порт
+        SignUpServlet signUpServlet = new SignUpServlet(accountService);
+        SignInServlet signInServlet = new SignInServlet(accountService);
 
-        // Создаем сервлет-контейнер
         ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
-        server.setHandler(context);
+        context.addServlet(new ServletHolder(signUpServlet), "/signup");
+        context.addServlet(new ServletHolder(signInServlet), "/signin");
 
-        // Передаем в него обработчик и запрос
-        context.addServlet(new ServletHolder(frontend), "/mirror");
+        Server server = new Server(8080);
+        server.setHandler(context);
 
         server.start();
         java.util.logging.Logger.getGlobal().info("Server started");
