@@ -2,6 +2,7 @@ package servlets;
 
 import accounts.AccountService;
 import accounts.UserProfile;
+import exception.DBException;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -30,10 +31,17 @@ public class SignInServlet extends HttpServlet {
             return;
         }
 
-        UserProfile userProfile = accountService.getUserByLogin(login);
+        UserProfile userProfile = null;
+
+        try {
+            userProfile = accountService.getUserByLogin(login);
+        } catch (DBException e) {
+            e.printStackTrace();
+        }
 
         if (userProfile == null || !userProfile.getPass().equals(password)) {
             resp.setContentType("text/html;charset=utf-8");
+            resp.getWriter().println("Unauthorized");
             resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             return;
         }

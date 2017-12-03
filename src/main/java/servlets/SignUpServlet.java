@@ -2,6 +2,7 @@ package servlets;
 
 import accounts.AccountService;
 import accounts.UserProfile;
+import exception.DBException;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -28,7 +29,11 @@ public class SignUpServlet extends HttpServlet {
             return;
         }
 
-        accountService.addNewUser(new UserProfile(login, password, ""));
+        try {
+            accountService.addNewUser(login, password, "");
+        } catch (DBException e) {
+            e.printStackTrace();
+        }
 
         resp.setContentType("text/html;charset=utf-8");
         resp.setStatus(HttpServletResponse.SC_OK);

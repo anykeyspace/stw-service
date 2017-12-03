@@ -1,35 +1,71 @@
 package accounts;
 
-import java.util.HashMap;
-import java.util.Map;
+import exception.DBException;
+import org.hibernate.HibernateException;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
+import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
+import org.hibernate.cfg.Configuration;
+import org.hibernate.service.ServiceRegistry;
+
 
 public class AccountService {
-    private final Map<String, UserProfile> loginToProfile;
-    private final Map<String, UserProfile> sessionIdToProfile;
+    private static final String hibernate_show_sql = "true";
+    private static final String hibernate_hbm2ddl_auto = "create";
+
+    private final SessionFactory sessionFactory;
 
     public AccountService() {
-        loginToProfile = new HashMap<>();
-        sessionIdToProfile = new HashMap<>();
+        Configuration configuration = getH2Configuration();
+        sessionFactory = createSessionFactory(configuration);
     }
 
-    public void addNewUser(UserProfile userProfile) {
-        loginToProfile.put(userProfile.getLogin(), userProfile);
+    private Configuration getH2Configuration() {
+        Configuration configuration = new Configuration();
+        configuration.addAnnotatedClass(UserProfile.class);
+
+        configuration.setProperty("hibernate.dialect", "org.hibernate.dialect.H2Dialect");
+        configuration.setProperty("hibernate.connection.driver_class", "org.h2.Driver");
+        configuration.setProperty("hibernate.connection.url", "jdbc:h2:./h2db");
+        configuration.setProperty("hibernate.connection.username", "tully");
+        configuration.setProperty("hibernate.connection.password", "tully");
+        configuration.setProperty("hibernate.show_sql", hibernate_show_sql);
+        configuration.setProperty("hibernate.hbm2ddl.auto", hibernate_hbm2ddl_auto);
+        return configuration;
     }
 
-    public void addSession(String sessionId, UserProfile userProfile) {
-        sessionIdToProfile.put(sessionId, userProfile);
+    private static SessionFactory createSessionFactory(Configuration configuration) {
+        StandardServiceRegistryBuilder builder = new StandardServiceRegistryBuilder();
+        builder.applySettings(configuration.getProperties());
+        ServiceRegistry serviceRegistry = builder.build();
+        return configuration.buildSessionFactory(serviceRegistry);
     }
 
-    public UserProfile getUserByLogin(String login) {
-        return loginToProfile.get(login);
+    public long addNewUser(String login, String pass, String email) throws DBException {
+        try {
+            Session session = sessionFactory.openSession();
+            Transaction transaction = session.beginTransaction();
+            UserDAO dao = new UserDAO(session);
+            long id = dao.insertUser(login, pass, email);
+            transaction.commit();
+            session.close();
+            return id;
+        } catch (HibernateException e) {
+            throw new DBException(e);
+        }
     }
 
-    public UserProfile getUserBySessionId(String sessionId) {
-        return sessionIdToProfile.get(sessionId);
-    }
-
-    public void deleteSession(String sessionId) {
-        sessionIdToProfile.remove(sessionId);
+    public UserProfile getUserByLogin(String login) throws DBException {
+        try {
+            Session session = sessionFactory.openSession();
+            UserDAO dao = new UserDAO(session);
+            UserProfile profile = dao.getUserByLogin(login);
+            session.close();
+            return profile;
+        } catch (HibernateException e) {
+            throw new DBException(e);
+        }
     }
 
 }

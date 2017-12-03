@@ -12,8 +12,8 @@ public class Main {
     public static void main(String[] args) throws Exception {
         AccountService accountService = new AccountService();
 
-        accountService.addNewUser(new UserProfile("admin"));
-        accountService.addNewUser(new UserProfile("test"));
+        accountService.addNewUser("admin", "admin", "admin");
+        accountService.addNewUser("test", "test", "test");
 
         SignUpServlet signUpServlet = new SignUpServlet(accountService);
         SignInServlet signInServlet = new SignInServlet(accountService);
