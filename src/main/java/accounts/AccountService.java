@@ -13,6 +13,7 @@ import org.hibernate.service.ServiceRegistry;
 public class AccountService {
     private static final String hibernate_show_sql = "true";
     private static final String hibernate_hbm2ddl_auto = "create";
+    private Integer usersLimit = 10;
 
     private final SessionFactory sessionFactory;
 
@@ -68,4 +69,11 @@ public class AccountService {
         }
     }
 
+    public Integer getUsersLimit() {
+        return usersLimit;
+    }
+
+    public void setUsersLimit(Integer usersLimit) {
+        this.usersLimit = usersLimit;
+    }
 }
