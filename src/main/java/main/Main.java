@@ -14,10 +14,26 @@ import servlets.chat.WebSocketChatServlet;
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
 import javax.management.StandardMBean;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.management.ManagementFactory;
+import java.util.Properties;
 
 public class Main {
     public static void main(String[] args) throws Exception {
+        Properties properties = new Properties();
+
+        try (InputStream inputStream = new FileInputStream("config.properties")) {
+            properties.load(inputStream);
+
+            System.out.println(properties.getProperty("database"));
+            System.out.println(properties.getProperty("dbuser"));
+            System.out.println(properties.getProperty("dbpassword"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         AccountService accountService = new AccountService();
 
         accountService.addNewUser("admin", "admin", "admin");
