@@ -1,7 +1,6 @@
 package servlets;
 
 import accounts.AccountService;
-import accounts.UserProfile;
 import exception.DBException;
 
 import javax.servlet.ServletException;
@@ -23,8 +22,9 @@ public class SignUpServlet extends HttpServlet {
         String login = req.getParameter("login");
         String password = req.getParameter("password");
 
+        resp.setContentType("text/html;charset=utf-8");
+
         if (login == null || password == null) {
-            resp.setContentType("text/html;charset=utf-8");
             resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             return;
         }
@@ -35,7 +35,6 @@ public class SignUpServlet extends HttpServlet {
             e.printStackTrace();
         }
 
-        resp.setContentType("text/html;charset=utf-8");
         resp.setStatus(HttpServletResponse.SC_OK);
     }
 }
