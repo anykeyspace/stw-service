@@ -1,14 +1,13 @@
 package servlets.chat;
 
-import org.eclipse.jetty.util.ConcurrentHashSet;
-
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class ChatService {
     private Set<ChatWebSocket> webSockets;
 
     ChatService() {
-        webSockets = new ConcurrentHashSet<>();
+        webSockets = ConcurrentHashMap.newKeySet();
     }
 
     public void sendMessage(String message) {
