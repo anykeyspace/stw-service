@@ -74,3 +74,18 @@ create table if not exists users (id bigint auto_increment, login varchar(256), 
 Вывести значение usersLimit в JMX с именем:
 Admin:type=AccountServerController.usersLimit
 Сделать значение этой переменной изменяемым.
+
+### home work №6
+
+Добавить в сервер класс resources.TestResource
+
+Написать ResourceServer, который будет содержать ссылку на TestResource.
+Вывести ResourceServer в JMX с именем:
+Admin:type=ResourceServerController
+Сделать переменные "name" и "age" доступными для чтения из jmx клиента.
+
+Написать сервлет, который будет обрабатывать запросы на /resources
+При получении POST запроса с параметром path=path_to_resource
+прочитает ресурс TestResource из указанного в параметре файла и сохранит ссылку в ResourceService
+
+После чтения, значения name и age должны быть доступны по JMX.
