@@ -6,7 +6,10 @@ import accounts.ControllerMBean;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
+import resources.ResourceService;
+import resources.ResourceServiceMBean;
 import servlets.AccountServlet;
+import servlets.ResourceServlet;
 import servlets.SignInServlet;
 import servlets.SignUpServlet;
 import servlets.chat.WebSocketChatServlet;
@@ -45,15 +48,22 @@ public class Main {
         StandardMBean mBean = new StandardMBean(accountController, ControllerMBean.class);
         mBeanServer.registerMBean(mBean, objectName);
 
+        ResourceService resourceService = new ResourceService();
+        ObjectName resourceServiceName = new ObjectName("Admin:type=ResourceServerController");
+        StandardMBean resourceServiceMBean = new StandardMBean(resourceService, ResourceServiceMBean.class);
+        mBeanServer.registerMBean(resourceServiceMBean, resourceServiceName);
+
         AccountServlet accountServlet = new AccountServlet(accountController);
         SignUpServlet signUpServlet = new SignUpServlet(accountService);
         SignInServlet signInServlet = new SignInServlet(accountService);
+        ResourceServlet resourceServlet = new ResourceServlet(resourceService);
 
         ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
         context.addServlet(new ServletHolder(accountServlet), "/admin");
         context.addServlet(new ServletHolder(signUpServlet), "/signup");
         context.addServlet(new ServletHolder(signInServlet), "/signin");
         context.addServlet(new ServletHolder(new WebSocketChatServlet()), "/chat");
+        context.addServlet(new ServletHolder(resourceServlet), "/resources");
 
         Server server = new Server(8080);
         server.setHandler(context);
